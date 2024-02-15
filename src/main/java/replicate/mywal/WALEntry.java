@@ -3,7 +3,7 @@ package replicate.mywal;
 import java.nio.ByteBuffer;
 
 public class WALEntry {
-    private final static int sizeOfInt = 4, sizeOfLong = 8;
+    public final static int sizeOfInt = 4, sizeOfLong = 8;
     private long timestamp, generation, entryIdx;
     private EntryType entryType;
     private byte[] data;
