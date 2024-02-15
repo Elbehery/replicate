@@ -3,32 +3,29 @@ package replicate.mywal;
 import java.nio.ByteBuffer;
 
 public class WALEntry {
-    private static int sizeOfInt = 4;
-    private static int sizeOfLong = 8;
-    private long entryIndex;
-    private long generation;
-    private long timestamp;
+    private final static int sizeOfInt = 4, sizeOfLong = 8;
+    private long timestamp, generation, entryIdx;
     private EntryType entryType;
     private byte[] data;
 
-    public WALEntry(long entryIndex, long generation, EntryType entryType, byte[] data) {
-        this.entryIndex = entryIndex;
+    public WALEntry(long generation, long entryIdx, EntryType entryType, byte[] data) {
         this.generation = generation;
-        this.timestamp = System.currentTimeMillis();
+        this.entryIdx = entryIdx;
         this.entryType = entryType;
+        this.timestamp = System.currentTimeMillis();
         this.data = data;
     }
 
-    public long getEntryIndex() {
-        return entryIndex;
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public long getGeneration() {
         return generation;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getEntryIdx() {
+        return entryIdx;
     }
 
     public EntryType getEntryType() {
@@ -40,32 +37,24 @@ public class WALEntry {
     }
 
     public ByteBuffer serialize() {
-        var buf = ByteBuffer.allocate(sizeOfWALEntry());
+        var buf = ByteBuffer.allocate(sizeOfEntry());
         buf.clear();
         buf.putInt(serializedSize());
         buf.putInt(entryType.getVal());
         buf.putLong(generation);
-        buf.putLong(entryIndex);
+        buf.putLong(entryIdx);
         buf.putLong(timestamp);
         buf.put(data);
         return buf;
     }
 
     // helpers
-    private int sizeOfWALEntry() {
+    private int sizeOfEntry() {
         return sizeOfInt + serializedSize();
     }
 
     private int serializedSize() {
-        return sizeOfEntryIndex() + sizeOfEntryType() + sizeOfGeneration() + sizeOfTimestamp() + sizeOfData();
-    }
-
-    private int sizeOfData() {
-        return data.length;
-    }
-
-    private int sizeOfEntryIndex() {
-        return sizeOfLong;
+        return sizeOfEntryIdx() + sizeOfGeneration() + sizeOfTimestamp() + sizeOfEntryType() + sizeOfData();
     }
 
     private int sizeOfGeneration() {
@@ -74,6 +63,14 @@ public class WALEntry {
 
     private int sizeOfTimestamp() {
         return sizeOfLong;
+    }
+
+    private int sizeOfEntryIdx() {
+        return sizeOfLong;
+    }
+
+    private int sizeOfData() {
+        return data.length;
     }
 
     private int sizeOfEntryType() {
