@@ -49,7 +49,7 @@ public class WALEntry {
     }
 
     // helpers
-    private int sizeOfEntry() {
+    int sizeOfEntry() {
         return sizeOfInt + serializedSize();
     }
 
